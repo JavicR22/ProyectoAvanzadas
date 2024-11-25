@@ -7,6 +7,11 @@ import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.Serial;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
 import javax.imageio.ImageIO;
 public class ManejadorVisualImagen extends SimpleChannelInboundHandler<byte[]>{
     private final ServidorGUI servidorGUI;
@@ -23,7 +28,16 @@ public class ManejadorVisualImagen extends SimpleChannelInboundHandler<byte[]>{
         try {
 
 
-            // Convertir bytes a imagen
+						HttpClient client = HttpClient.newHttpClient();
+						HttpRequest request = HttpRequest.newBuilder()
+							.uri(URI.create("http://localhost:8080/api/grabacion/guardar-frame/1"))
+							.header("Content-Type", "application/octet-stream")
+							.POST(HttpRequest.BodyPublishers.ofByteArray(msg))
+							.build();
+
+					HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+					// Convertir bytes a imagen
             ByteArrayInputStream bais = new ByteArrayInputStream(msg);
             BufferedImage image = ImageIO.read(bais);
 
